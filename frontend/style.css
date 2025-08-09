@@ -22,7 +22,7 @@ body {
         color 0.3s;
 }
 
-#storyContainer p {
+#storyContainer {
     text-align: justify;
     line-height: 1.6;
     word-break: break-word;

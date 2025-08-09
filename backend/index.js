@@ -23,10 +23,10 @@ app.post("/generate-story-stream", async (req, res) => {
     res.setHeader("Connection", "keep-alive");
 
     const storyPrompt = `
-    You are a creative storyteller.
-    Write an engaging ${style} story of about ${wordCount} words based on the following prompt:
-    "${prompt}"
-    Do not exceed ${wordCount + 20} words.
+You are a storyteller.
+Write an engaging ${style} story of about ${wordCount} words based on the following prompt:
+"${prompt}"
+Preserve natural paragraph spacing. Do not exceed ${wordCount + 20} words.
     `;
 
     try {
@@ -44,20 +44,19 @@ app.post("/generate-story-stream", async (req, res) => {
         const data = await response.json();
         const story = data.candidates?.[0]?.content?.parts?.[0]?.text || "No story generated.";
 
-        // Simulate streaming word-by-word
-        const words = story.split(" ");
+        const paragraphs = story.split(/\n\s*\n/);
         let index = 0;
 
         const interval = setInterval(() => {
-            if (index < words.length) {
-                res.write(`data: ${words[index]}\n\n`);
+            if (index < paragraphs.length) {
+                res.write(`data: ${paragraphs[index]}\n\n`);
                 index++;
             } else {
                 clearInterval(interval);
                 res.write("data: [DONE]\n\n");
                 res.end();
             }
-        }, 80); // 80ms per word
+        }, 800);
     } catch (error) {
         console.error(error);
         res.write(`data: Error generating story.\n\n`);

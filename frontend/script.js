@@ -6,84 +6,107 @@ const wordCountValue = document.getElementById("wordCountValue");
 const storyContainer = document.getElementById("storyContainer");
 const loading = document.getElementById("loading");
 const controls = document.getElementById("controls");
-
 const darkModeBtn = document.getElementById("darkModeBtn");
 const readAloudBtn = document.getElementById("readAloudBtn");
 const downloadTxtBtn = document.getElementById("downloadTxt");
 const downloadPdfBtn = document.getElementById("downloadPdf");
 
-let currentStory = "";
 let isReading = false;
 let utterance = null;
+let fullStory = "";
 
-// Update slider value display
-wordCountSlider.addEventListener("input", () => {
-    wordCountValue.textContent = wordCountSlider.value;
+document.getElementById("wordCount").addEventListener("input", (e) => {
+    document.getElementById("wordCountValue").textContent = e.target.value;
 });
 
-// Generate Story
-generateBtn.addEventListener("click", () => {
-    const userPrompt = promptInput.value.trim();
-    if (!userPrompt) {
-        alert("Please enter a story idea.");
+document.getElementById("generateBtn").addEventListener("click", () => {
+    const prompt = document.getElementById("prompt").value;
+    const style = document.getElementById("style").value;
+    const wordCount = document.getElementById("wordCount").value;
+    const storyContainer = document.getElementById("storyContainer");
+
+    if (!prompt.trim()) {
+        alert("Please enter a prompt.");
         return;
     }
 
     storyContainer.innerHTML = "";
-    const storyDisplay = document.createElement("p");
-    storyDisplay.style.textAlign = "justify"; // Justify text
-    storyContainer.appendChild(storyDisplay);
+    document.getElementById("loading").textContent = "⏳ The AI is thinking...";
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("controls").classList.add("hidden");
 
-    currentStory = "";
-    controls.classList.add("hidden");
-    loading.classList.remove("hidden");
+    let started = false;
 
     fetch("http://localhost:3000/generate-story-stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            prompt: userPrompt,
-            style: styleSelect.value,
-            wordCount: parseInt(wordCountSlider.value)
-        })
-    }).then(response => {
-        const reader = response.body.getReader();
+        body: JSON.stringify({ prompt, style, wordCount })
+    }).then(async (res) => {
+        const reader = res.body.getReader();
         const decoder = new TextDecoder("utf-8");
 
-        function readChunk() {
-            reader.read().then(({ done, value }) => {
-                if (done) {
-                    loading.classList.add("hidden");
-                    controls.classList.remove("hidden");
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            const lines = chunk.split("\n\n").filter(l => l.startsWith("data:"));
+
+            for (let line of lines) {
+                let text = line.replace(/^data:\s*/, "");
+                if (text === "[DONE]") {
+                    document.getElementById("controls").classList.remove("hidden");
                     return;
                 }
-
-                const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split("\n\n");
-
-                lines.forEach(line => {
-                    if (line.startsWith("data: ")) {
-                        const text = line.replace("data: ", "");
-                        if (text === "[DONE]") {
-                            loading.classList.add("hidden");
-                            controls.classList.remove("hidden");
-                            return;
-                        }
-                        storyDisplay.textContent += text + " ";
-                        currentStory += text + " ";
-                    }
-                });
-
-                readChunk();
-            });
+                if (!started) {
+                    document.getElementById("loading").textContent = "📜 Here is your story:";
+                    started = true;
+                }
+                if (text.trim()) {
+                    fullStory += text + "\n\n";
+                    storyContainer.innerHTML = fullStory
+                        .replace(/\n\s*\n/g, "<br><br>")
+                        .replace(/\n/g, "<br>");
+                }
+            }
         }
-
-        readChunk();
-    }).catch(error => {
-        console.error("Error:", error);
-        loading.classList.add("hidden");
-        storyContainer.innerHTML = "Error generating story.";
     });
+
+    // Save PDF
+    document.getElementById("downloadPdf").onclick = () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 15;
+        const maxWidth = pageWidth - (margin * 2);
+        const fontSize = 15;
+        const lineHeight = 6;
+
+        doc.setFontSize(fontSize);
+        let y = margin;
+
+        const paragraphs = fullStory.trim().split(/\n\s*\n/);
+
+        paragraphs.forEach(p => {
+            const lines = doc.splitTextToSize(p, maxWidth);
+            const paragraphHeight = lines.length * lineHeight;
+
+            if (y + paragraphHeight > pageHeight - margin) {
+                doc.addPage();
+                y = margin;
+            }
+
+            lines.forEach(line => {
+                doc.text(line, margin, y);
+                y += lineHeight;
+            });
+
+            y += lineHeight;
+        });
+
+        doc.save(`${prompt.replace(/\s+/g, "_")}_story.pdf`);
+    };
 });
 
 // Toggle Dark Mode
@@ -93,13 +116,14 @@ darkModeBtn.addEventListener("click", () => {
 
 // Read Aloud with Play/Pause
 readAloudBtn.addEventListener("click", () => {
-    if (!currentStory) return;
+    if (!fullStory) {
+        console.log("No story available for reading.");
+        return;
+    }
 
     if (!isReading) {
-        // Start reading
-        const storyText = `This is the AI-generated story based on your prompt. Here is the story: `;
-        currentStory = storyText + currentStory;
-        utterance = new SpeechSynthesisUtterance(currentStory);
+        const storyToRead = `This is the AI-generated story based on your prompt. Here is the story: ${fullStory}`;
+        utterance = new SpeechSynthesisUtterance(storyToRead);
         utterance.onend = () => {
             isReading = false;
             readAloudBtn.textContent = "▶ Read Aloud";
@@ -108,7 +132,6 @@ readAloudBtn.addEventListener("click", () => {
         isReading = true;
         readAloudBtn.textContent = "⏸ Pause";
     } else {
-        // Pause or resume
         if (speechSynthesis.speaking && !speechSynthesis.paused) {
             speechSynthesis.pause();
             readAloudBtn.textContent = "▶ Resume";
@@ -119,18 +142,7 @@ readAloudBtn.addEventListener("click", () => {
     }
 });
 
-// Stop audio on refresh or navigation away
 window.addEventListener("beforeunload", () => {
     speechSynthesis.cancel();
     isReading = false;
-});
-
-// Download PDF
-downloadPdfBtn.addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF();
-    pdf.setFontSize(12);
-    const lines = pdf.splitTextToSize(currentStory, 180);
-    pdf.text(lines, 10, 10);
-    pdf.save(`${promptInput.value.replace(/\s+/g, "_")}_story.pdf`);
 });
