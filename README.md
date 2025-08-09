@@ -69,3 +69,7 @@ If you want to contribute to this project, feel free to fork the repository and 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Check Live Project
+
+You can check the live version of the project at [AI Prompt Story Generator](https://story-writer-hosting.vercel.app/).
