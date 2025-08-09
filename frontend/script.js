@@ -87,6 +87,9 @@ document.getElementById("generateBtn").addEventListener("click", () => {
         let y = margin;
 
         const paragraphs = fullStory.trim().split(/\n\s*\n/);
+        const title = `Given Prompt: ${prompt}`;
+        doc.text(title, margin, y);
+        y += lineHeight * 2;
 
         paragraphs.forEach(p => {
             const lines = doc.splitTextToSize(p, maxWidth);
