@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI Story Generator</title>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>📖 AI Story Generator</h1>
+
+            <textarea
+                id="prompt"
+                placeholder="Enter your story idea..."
+            ></textarea>
+
+            <label>Story Style:</label>
+            <select id="style">
+                <option>Fantasy</option>
+                <option>Mystery</option>
+                <option>Romance</option>
+                <option>Sci-Fi</option>
+            </select>
+
+            <label>Word Count: <span id="wordCountValue">300</span></label>
+            <input
+                type="range"
+                id="wordCount"
+                min="200"
+                max="500"
+                value="300"
+            />
+
+            <button id="generateBtn">Generate Story</button>
+            <button id="darkModeBtn">🌙 Toggle Dark Mode</button>
+
+            <div id="loading" class="hidden">⏳ Generating your story...</div>
+            <div id="storyContainer"></div>
+
+            <div id="controls" class="hidden">
+                <button id="readAloudBtn">🔊 Read Story</button>
+                <button id="downloadPdf">📄 Download Story</button>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>

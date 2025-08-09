@@ -1,0 +1,103 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    transition:
+        background 0.3s,
+        color 0.3s;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+    transition:
+        background 0.3s,
+        color 0.3s;
+}
+
+#storyContainer p {
+    text-align: justify;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+textarea,
+select,
+input {
+    width: 90%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 15px;
+    background: #007bff;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+.hidden {
+    display: none;
+}
+
+.dark-mode {
+    background: #1e1e1e;
+    color: white;
+}
+
+.dark-mode .container {
+    background: #2e2e2e;
+}
+
+.dark-mode textarea,
+.dark-mode select,
+.dark-mode input {
+    background: #3e3e3e;
+    color: white;
+    border: 1px solid #666;
+}
+
+/* Mobile view adjustments */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+        box-shadow: none; /* softer look on mobile */
+        border-radius: 8px;
+    }
+
+    textarea,
+    select,
+    input {
+        font-size: 16px; /* better readability on mobile */
+        padding: 12px;
+    }
+
+    button {
+        width: 100%; /* full-width buttons for touch devices */
+        margin: 8px 0;
+        font-size: 16px;
+        padding: 12px;
+    }
+}
