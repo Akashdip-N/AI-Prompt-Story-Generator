@@ -31,7 +31,7 @@ Preserve natural paragraph spacing. Do not exceed ${wordCount + 20} words.
 
     try {
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -42,6 +42,7 @@ Preserve natural paragraph spacing. Do not exceed ${wordCount + 20} words.
         );
 
         const data = await response.json();
+        console.log(data);
         const story = data.candidates?.[0]?.content?.parts?.[0]?.text || "No story generated.";
 
         const paragraphs = story.split(/\n\s*\n/);
@@ -63,6 +64,11 @@ Preserve natural paragraph spacing. Do not exceed ${wordCount + 20} words.
         res.write("data: [DONE]\n\n");
         res.end();
     }
+});
+
+// Add near the top where you define routes
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
 });
 
 const PORT = 3000;

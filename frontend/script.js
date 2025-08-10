@@ -149,3 +149,57 @@ window.addEventListener("beforeunload", () => {
     speechSynthesis.cancel();
     isReading = false;
 });
+
+// ---------- Backend health check / indicator ----------
+const HEALTH_URL = "http://localhost:3000/health";
+const STATUS_EL = document.getElementById("appStatus");
+const STATUS_LABEL = STATUS_EL?.querySelector(".label");
+const POLL_INTERVAL_MS = 60000; // 60 seconds
+
+let healthPollTimer = null;
+
+async function updateStatusOnce() {
+  if (!STATUS_EL) return;
+  STATUS_EL.classList.remove("working", "down");
+  STATUS_EL.classList.add("unknown");
+  STATUS_LABEL.textContent = "Checking...";
+
+  try {
+    const resp = await fetch(HEALTH_URL, { method: "GET", cache: "no-store" , mode: 'cors' });
+    if (resp.ok) {
+      STATUS_EL.classList.remove("down", "unknown");
+      STATUS_EL.classList.add("working");
+      STATUS_LABEL.textContent = "The app is working";
+    } else {
+      STATUS_EL.classList.remove("working", "unknown");
+      STATUS_EL.classList.add("down");
+      STATUS_LABEL.textContent = "The app is not working";
+    }
+  } catch (err) {
+    STATUS_EL.classList.remove("working", "unknown");
+    STATUS_EL.classList.add("down");
+    STATUS_LABEL.textContent = "The app is not working";
+  }
+}
+
+function startHealthPolling() {
+  updateStatusOnce();
+  healthPollTimer = setInterval(updateStatusOnce, POLL_INTERVAL_MS);
+}
+
+function stopHealthPolling() {
+  if (healthPollTimer) {
+    clearInterval(healthPollTimer);
+    healthPollTimer = null;
+  }
+}
+
+// start polling when page loads
+window.addEventListener("load", () => {
+  startHealthPolling();
+});
+
+// stop polling when page unloads
+window.addEventListener("beforeunload", () => {
+  stopHealthPolling();
+});

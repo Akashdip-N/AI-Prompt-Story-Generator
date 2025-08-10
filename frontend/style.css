@@ -73,6 +73,49 @@ button:hover {
     border: 1px solid #666;
 }
 
+/* App status badge (top-right) */
+#appStatus {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+  font-size: 13px;
+  color: #222;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  z-index: 9999;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+/* small circle */
+#appStatus .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: gray; /* default */
+  box-shadow: 0 0 6px rgba(0,0,0,0.08);
+}
+
+/* states */
+#appStatus.working { background: rgba(19,163,74,0.12); color: #0f5132; }
+#appStatus.working .dot { background: #13a34a; box-shadow: 0 0 8px rgba(19,163,74,0.3); }
+
+#appStatus.down { background: rgba(220,53,69,0.08); color: #7a1620; }
+#appStatus.down .dot { background: #dc3545; box-shadow: 0 0 8px rgba(220,53,69,0.25); }
+
+#appStatus.unknown { background: rgba(0,0,0,0.04); color: #444; }
+#appStatus.unknown .dot { background: #999; box-shadow: none; }
+
+/* mobile: keep it smaller and not overlapping content */
+@media (max-width: 480px) {
+  #appStatus { top: 12px; right: 12px; font-size: 12px; padding: 5px 8px; }
+  #appStatus .dot { width: 9px; height: 9px; }
+}
+
 /* Mobile view adjustments */
 @media (max-width: 600px) {
     body {
