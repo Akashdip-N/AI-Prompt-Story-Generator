@@ -46,22 +46,28 @@ Preserve natural paragraph spacing. Do not exceed ${wordCount + 20} words.
         );
 
         const data = await response.json();
-        console.log(data);
-        const story = data.candidates?.[0]?.content?.parts?.[0]?.text || "No story generated.";
 
-        const paragraphs = story.split(/\n\s*\n/);
-        let index = 0;
+        if (data.status == 'RESOURCE_EXHAUSTED') {
+            const status = "RESOURCE_EXHAUSTED";
+            res.write(`data: ${status}\n\n`);
+            res.write("data: [DONE]\n\n");
+        }
+        else {
+            const story = data.candidates?.[0]?.content?.parts?.[0]?.text || "No story generated.";
+            const paragraphs = story.split(/\n\s*\n/);
+            let index = 0;
 
-        const interval = setInterval(() => {
-            if (index < paragraphs.length) {
-                res.write(`data: ${paragraphs[index]}\n\n`);
-                index++;
-            } else {
-                clearInterval(interval);
-                res.write("data: [DONE]\n\n");
-                res.end();
-            }
-        }, 800);
+            const interval = setInterval(() => {
+                if (index < paragraphs.length) {
+                    res.write(`data: ${paragraphs[index]}\n\n`);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                    res.write("data: [DONE]\n\n");
+                    res.end();
+                }
+            }, 800);
+        }
     } catch (error) {
         console.error(error);
         res.write(`data: Error generating story.\n\n`);

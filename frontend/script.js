@@ -53,6 +53,10 @@ document.getElementById("generateBtn").addEventListener("click", () => {
 
             for (let line of lines) {
                 let text = line.replace(/^data:\s*/, "");
+                if (text === "RESOURCE_EXHAUSTED") {
+                    document.getElementById("loading").textContent = "⚠️ Resource limit reached. Please try again later.";
+                    return;
+                }
                 if (text === "[DONE]") {
                     document.getElementById("controls").classList.remove("hidden");
                     return;

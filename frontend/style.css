@@ -100,15 +100,38 @@ button:hover {
   box-shadow: 0 0 6px rgba(0,0,0,0.08);
 }
 
-/* states */
-#appStatus.working { background: rgba(19,163,74,0.12); color: #0f5132; }
-#appStatus.working .dot { background: #13a34a; box-shadow: 0 0 8px rgba(19,163,74,0.3); }
+/* working (green) */
+#appStatus.working {
+  background: rgba(40, 167, 69, 0.2); /* softer green overlay */
+  color: #28a745; /* bright green text */
+}
 
-#appStatus.down { background: rgba(220,53,69,0.08); color: #7a1620; }
-#appStatus.down .dot { background: #dc3545; box-shadow: 0 0 8px rgba(220,53,69,0.25); }
+/* down (red) */
+#appStatus.down {
+  background: rgba(220, 53, 69, 0.2); /* softer red overlay */
+  color: #dc3545; /* bright red text */
+}
 
-#appStatus.unknown { background: rgba(0,0,0,0.04); color: #444; }
-#appStatus.unknown .dot { background: #999; box-shadow: none; }
+/* dot colors stay solid */
+#appStatus.working .dot {
+  background: #28a745;
+  box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+}
+#appStatus.down .dot {
+  background: #dc3545;
+  box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+}
+
+/* Unknown (gray) */
+#appStatus.unknown {
+  background: rgba(108, 117, 125, 0.2); /* neutral semi-transparent gray */
+  color: #adb5bd; /* light gray text for visibility in dark mode */
+}
+
+#appStatus.unknown .dot {
+  background: #6c757d; /* medium gray */
+  box-shadow: 0 0 6px rgba(108, 117, 125, 0.4);
+}
 
 /* mobile: keep it smaller and not overlapping content */
 @media (max-width: 480px) {
