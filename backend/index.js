@@ -10,6 +10,10 @@ app.use(express.json());
 
 const API_KEY = process.env.GOOGLE_API_KEY;
 
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.post("/generate-story-stream", async (req, res) => {
     const { prompt, style, wordCount } = req.body;
 
@@ -64,11 +68,6 @@ Preserve natural paragraph spacing. Do not exceed ${wordCount + 20} words.
         res.write("data: [DONE]\n\n");
         res.end();
     }
-});
-
-// Add near the top where you define routes
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
 });
 
 const PORT = 3000;
